@@ -2,23 +2,27 @@
 
 `.psd`·`.svg` 파일의 요소를 새 규격에 맞춰 자동 배치하고, 개별 수정 후 PNG로 저장하는 웹 편집기입니다. 로컬 서버에서는 PDF 호환 `.ai` 변환도 지원합니다. 서비스 정의와 구현 기준은 [PROJECT_INTENT.md](PROJECT_INTENT.md)에 정리했습니다.
 
-## 웹사이트
+## 로컬 실행
 
-- 접속: https://sabyunrepo.github.io/reflow-studio/
-- GitHub Pages에서는 PSD·SVG 업로드, 개별 편집, 반응형 배치, PNG 출력을 사용합니다.
-- PSD 파일은 사용자의 브라우저에서 처리합니다.
-- GitHub Pages는 서버 실행을 지원하지 않아 `.ai` 직접 변환은 로컬 서버에서 사용합니다. 웹에서는 Illustrator에서 SVG로 저장한 파일을 업로드하세요. AI 벡터 샘플은 사전 변환된 SVG로 제공합니다.
-- 6개 레이어의 `assets/reflow-demo.psd`는 이 프로젝트에서 직접 만든 데모입니다. PSD 샘플 버튼으로 불러올 수 있습니다.
+이 프로젝트는 내 컴퓨터에서 실행하는 웹 편집기입니다. AI 파일 변환은 로컬 서버에서 처리하고, PSD·SVG 편집과 PNG 저장은 브라우저에서 처리합니다.
 
-## 실행
-
-macOS에서 Poppler가 설치되어 있고 `pdftocairo`가 PATH에 있는 상태로:
+macOS에서 Node.js와 Poppler를 준비합니다. Homebrew를 사용하는 경우:
 
 ```sh
-node server.mjs
+brew install node poppler
 ```
 
-브라우저에서 `http://localhost:4173`을 엽니다. Node.js 20 이상을 권장합니다.
+프로젝트를 내려받아 실행합니다.
+
+```sh
+git clone https://github.com/sabyunrepo/reflow-studio.git
+cd reflow-studio
+npm start
+```
+
+브라우저에서 [http://localhost:4173](http://localhost:4173)을 엽니다. 이미 프로젝트가 있으면 해당 폴더에서 `npm start`만 실행하면 됩니다. 별도의 패키지 설치나 빌드는 필요하지 않습니다. Node.js 20 이상과 `pdftocairo` 명령을 사용할 수 있어야 합니다.
+
+AI·PSD·SVG 파일을 선택하거나 샘플 버튼으로 시작합니다. 6개 레이어의 `assets/reflow-demo.psd`는 프로젝트에서 직접 만든 데모입니다. 작업을 마치면 서버를 실행한 터미널에서 `Ctrl+C`로 종료합니다.
 
 ## 사용 범위
 
@@ -43,8 +47,6 @@ AI의 중첩 변환은 캔버스 좌표로 환산해 요소별로 계산합니�
 
 `node --test tests/*.test.mjs`로 실제 PSD에서 추출한 레이어 좌표와 마스크·테두리 픽셀 처리를 검사합니다. 브라우저 상호작용과 실제 PNG 육안 검수 내역은 [QA_REVIEW.md](QA_REVIEW.md)에 기록합니다. 검수 이미지와 PNG 출력은 로컬 `artifacts/`에 보관합니다.
 
-## 배포
+## 저장소 사용
 
-`npm run build`는 `_site/`에 실행에 필요한 정적 파일만 준비합니다. `main` 브랜치로 푸시하면 `.github/workflows/pages.yml`에서 GitHub Pages로 자동 배포합니다. 배포 폴더에는 HTML·모듈·라이브러리·공개 데모만 포함합니다. 추가 패키지 설치는 필요하지 않습니다.
-
-로컬 `server.mjs`는 `runtime-config.mjs` 응답으로 AI 변환 API 경로를 제공하고, 정적 배포 파일은 API 없이 동작합니다.
+GitHub 저장소는 소스 코드와 변경 이력을 관리합니다. 변경 내용을 내려받은 뒤 로컬 서버를 실행해 사용합니다. 자동 배포 워크플로는 사용하지 않습니다.

@@ -1,6 +1,5 @@
 .DS_Store
 node_modules/
-_site/
 artifacts/
 .env
 .env.*

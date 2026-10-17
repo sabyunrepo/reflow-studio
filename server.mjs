@@ -31,9 +31,6 @@ async function convertAi(inputPath) {
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-    if (req.method === 'GET' && url.pathname === '/runtime-config.mjs') {
-      return send(res, 200, 'export const aiConvertEndpoint = "./api/convert";\n', 'text/javascript; charset=utf-8');
-    }
     if (req.method === 'POST' && url.pathname === '/api/convert') {
       const length = Number(req.headers['content-length'] || 0);
       if (length > maxBytes) return send(res, 413, JSON.stringify({ error: '파일은 15MB 이하만 사용할 수 있습니다.' }), 'application/json; charset=utf-8');
