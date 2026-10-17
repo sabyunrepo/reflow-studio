@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+_site/
+artifacts/
+.env
+.env.*
+!.env.example
+assets/sample-design-640x480.psd
+assets/sample-vector-letter.ai
+graphify-out/

@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>디자인 사이즈 변환 MVP</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #18212f; background: #f4f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    header { height: 70px; padding: 0 28px; background: #fff; border-bottom: 1px solid #e5e9ef; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 750; letter-spacing: -.03em; }
+    .brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: #4f46e5; color: white; font-weight: 800; }
+    .top-note { color: #7b8492; font-size: 13px; }
+    main { max-width: 1260px; margin: 0 auto; padding: 30px 26px 44px; }
+    .intro { margin: 0 0 22px; }
+    h1 { margin: 0 0 7px; font-size: 25px; letter-spacing: -.04em; }
+    .intro p { margin: 0; color: #707b8a; font-size: 14px; }
+    .workspace { min-height: 650px; background: white; border: 1px solid #e2e7ee; border-radius: 14px; display: grid; grid-template-columns: 285px minmax(0, 1fr) 250px; overflow: hidden; box-shadow: 0 8px 25px #2731420a; }
+    aside { padding: 24px 21px; border-right: 1px solid #e9edf2; }
+    .section-title { margin: 0 0 13px; color: #697486; font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+    .upload { padding: 18px 14px; border: 1px dashed #bac3d0; border-radius: 11px; background: #fafbfc; text-align: center; }
+    .upload-icon { font-size: 25px; margin-bottom: 8px; }
+    .upload p { margin: 0 0 12px; color: #778292; font-size: 12px; line-height: 1.55; }
+    input[type=file] { display: none; }
+    button, .file-button { border: 0; border-radius: 8px; background: #4f46e5; color: white; padding: 10px 13px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; transition: .15s; }
+    button:hover, .file-button:hover { background: #4338ca; }
+    button:disabled { opacity: .45; cursor: default; }
+    .secondary { color: #344054; background: white; border: 1px solid #dce2ea; }
+    .secondary:hover { color: #1f2937; background: #f5f7fa; }
+    .full { width: 100%; }
+    .sample-link { display: block; margin-top: 11px; color: #5149d9; font-size: 12px; text-decoration: none; cursor: pointer; }
+    .divider { height: 1px; background: #edf0f4; margin: 22px 0; }
+    label { display: block; margin: 0 0 8px; color: #475467; font-size: 12px; font-weight: 650; }
+    select { width: 100%; height: 40px; padding: 0 10px; border: 1px solid #dce2ea; border-radius: 8px; color: #273244; background: #fff; font: inherit; font-size: 13px; }
+    .dims { margin-top: 8px; color: #8a93a1; font-size: 11px; }
+    .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .control-grid label { margin: 0; font-size: 11px; }
+    .control-grid input { width: 100%; min-width: 0; margin-top: 5px; padding: 8px; border: 1px solid #dce2ea; border-radius: 6px; color: #273244; font: inherit; background: white; }
+    .responsive-panel { margin: 14px 0 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 9px; }
+    .responsive-panel[hidden] { display: none; }
+    .responsive-panel legend { padding: 0 4px; font-size: 12px; font-weight: 650; }
+    .auto-button { margin-top: 14px; }
+    .edit-panel { margin-top: 21px; padding: 14px; background: #f7f8fb; border-radius: 10px; }
+    .edit-panel strong { display: block; margin-bottom: 10px; font-size: 13px; }
+    .help { margin: 9px 0 0; color: #828c99; font-size: 11px; line-height: 1.5; }
+    .layer-panel { padding: 21px 14px; border-left: 1px solid #e9edf2; background: #fff; min-width: 0; }
+    .layer-panel[hidden] { display: none; }
+    .layer-heading { margin: 0 0 12px; color: #344054; font-size: 13px; font-weight: 700; }
+    .layer-list { max-height: 590px; overflow-y: auto; display: grid; gap: 5px; }
+    .layer-row { display: grid; grid-template-columns: minmax(0,1fr) 32px; gap: 4px; align-items: center; min-width: 0; }
+    .layer-item { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; height: 48px; padding: 5px 7px; overflow: hidden; border: 1px solid transparent; background: transparent; color: #475467; text-align: left; font-size: 11px; font-weight: 500; }
+    .layer-item:hover { background: #f3f4f8; }
+    .layer-item.active { border-color: #c7d2fe; background: #eef2ff; color: #4338ca; }
+    .layer-thumb { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; overflow: hidden; border: 1px solid #e4e7ec; border-radius: 5px; background: #f8f9fb; color: #98a2b3; }
+    img.layer-thumb { object-fit: contain; }
+    .layer-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .layer-visibility { width: 30px; height: 32px; padding: 0; border: 1px solid transparent; background: transparent; color: #667085; font-size: 15px; }
+    .layer-visibility:hover { border-color: #e4e7ec; background: #f7f8fa; }
+    .layer-row.is-hidden .layer-item, .layer-row.is-hidden .layer-visibility { opacity: .48; }
+    .status { min-height: 38px; padding: 11px 12px; margin-top: 14px; border-radius: 8px; color: #667085; background: #f5f7fa; white-space: pre-line; font-size: 11px; line-height: 1.5; }
+    .status.error { color: #a53f3f; background: #fff3f2; }
+    .stage { padding: 24px 28px; background: #f8f9fb; display: flex; flex-direction: column; min-width: 0; }
+    .stage-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .stage-head strong { font-size: 13px; }
+    .stage-head span { color: #8a93a1; font-size: 12px; }
+    .stage-head strong span { margin-left: 7px; color: #929baa; font-size: 11px; font-weight: 500; }
+    .canvas-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 500px; overflow: auto; padding: 14px; background-color: #eef1f5; border-radius: 11px; background-image: linear-gradient(45deg,#e8ebf0 25%,transparent 25%),linear-gradient(-45deg,#e8ebf0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8ebf0 75%),linear-gradient(-45deg,transparent 75%,#e8ebf0 75%); background-size: 18px 18px; background-position: 0 0,0 9px,9px -9px,-9px 0; }
+    #artboard { display: none; flex: none; background: white; box-shadow: 0 12px 35px #23334b24; touch-action: none; }
+    #artboard.has-art { display: block; }
+    #artboard .editable { cursor: grab; }
+    #artboard .editable[data-moveable-ready] { transform-box: fill-box; transform-origin: center; }
+    #artboard .editable:active { cursor: grabbing; }
+    #artboard .editable[data-canvas-layer="true"] { pointer-events: none; }
+    .moveable-control-box { --moveable-color: #4f46e5; z-index: 10; }
+    .layer-menu { position: fixed; z-index: 30; min-width: 150px; display: grid; gap: 3px; padding: 6px; border: 1px solid #e1e5ec; border-radius: 10px; background: #fff; box-shadow: 0 10px 28px #1d29391f; }
+    .layer-menu[hidden] { display: none; }
+    .layer-menu button { padding: 9px 12px; color: #344054; background: transparent; text-align: left; font-size: 12px; font-weight: 550; }
+    .layer-menu button:hover { background: #f2f4f7; }
+    .empty { max-width: 270px; text-align: center; color: #8490a0; font-size: 13px; line-height: 1.65; }
+    .empty b { display: block; margin-bottom: 5px; color: #5b6676; font-size: 15px; }
+    .footer-row { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; color: #8993a1; font-size: 11px; }
+    .export { min-width: 125px; }
+    @media (max-width: 1000px) { .workspace { grid-template-columns: 260px minmax(0,1fr); } .layer-panel { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #e9edf2; } .layer-list { max-height: 220px; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); } }
+    @media (max-width: 760px) { header { padding: 0 16px; } .top-note { display: none; } main { padding: 20px 12px; } .workspace { grid-template-columns: minmax(0,1fr) minmax(128px,42vw); } aside { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid #e9edf2; } .stage { grid-column: 1; min-height: 520px; padding: 17px 12px; } .layer-panel { grid-column: 2; padding: 12px 6px; } .layer-list { max-height: 520px; grid-template-columns: 1fr; } .layer-row { grid-template-columns: minmax(0,1fr) 24px; gap: 1px; } .layer-item { gap: 4px; padding: 3px; } .layer-thumb { flex-basis: 28px; width: 28px; height: 28px; } .layer-visibility { width: 24px; } .canvas-wrap { min-height: 390px; } }
+    @media (max-width: 480px) { .workspace { grid-template-columns: minmax(0,1fr); } .layer-panel { grid-column: 1; border-top: 1px solid #e9edf2; } .layer-list { max-height: 250px; } .stage-head { flex-wrap: wrap; gap: 8px; } .footer-row { flex-wrap: wrap; gap: 12px; } }
+  </style>
+</head>
+<body>
+  <header><div class="brand"><span class="brand-mark">R</span><span>Reflow Studio</span></div><span class="top-note">디자인 요소를 새 규격에 맞춰 편집하고 PNG로 저장합니다</span></header>
+  <main>
+    <div class="intro"><h1>디자인 사이즈 변환</h1><p>캔버스 크기에 맞춰 각 요소의 위치와 크기가 바뀝니다. 레이어별 반응형 기준을 조정하고 PNG로 저장하세요.</p></div>
+    <section class="workspace">
+      <aside>
+        <h2 class="section-title">1. 원본 파일</h2>
+        <div class="upload"><div class="upload-icon">▧</div><p id="file-label">요소가 분리된 AI·PSD·SVG 파일을 올려주세요.<br>AI는 PDF 호환 정보가 필요합니다.</p><label class="file-button" for="file-input">AI·PSD·SVG 파일 선택</label><input id="file-input" type="file" accept=".ai,.psd,.svg,image/svg+xml,application/postscript,application/pdf,image/vnd.adobe.photoshop"><a class="sample-link" id="sample-link">실제 Illustrator 작업 파일로 테스트하기 →</a><a class="sample-link" id="psd-sample-link">레이어가 있는 PSD 샘플로 테스트하기 →</a></div>
+        <div class="divider"></div>
+        <h2 class="section-title">2. 출력 규격</h2>
+        <label for="preset">캔버스 크기</label>
+        <select id="preset"><option value="1080,1080">정사각형 게시물 · 1080 × 1080</option><option value="1080,1920">세로 스토리 · 1080 × 1920</option><option value="1200,628">가로 배너 · 1200 × 628</option><option value="custom">원본 크기</option><option value="manual">직접 크기 설정</option></select>
+        <div class="control-grid"><label>캔버스 가로 (px)<input id="canvas-width" type="number" min="64" max="4096" value="1080"></label><label>캔버스 세로 (px)<input id="canvas-height" type="number" min="64" max="4096" value="1080"></label></div>
+        <div class="dims" id="dimensions">1080 × 1080 px</div>
+        <div class="dims" id="layout-note">규격을 선택하면 배경과 요소가 함께 맞춰집니다.</div>
+        <button class="secondary full auto-button" id="auto-fit" disabled>기본 반응형 배치로 초기화</button>
+        <div class="edit-panel"><strong>선택한 요소 조정</strong><p class="help">테두리로 이동·크기·회전을 조절하세요. 수정한 위치와 크기는 캔버스 대비 비율로 기억해 다른 규격에도 반영합니다.</p></div>
+        <fieldset class="responsive-panel" id="responsive-panel" hidden><legend>선택 요소의 반응형 기준</legend><div class="control-grid"><label>가로 위치 (%)<input id="rule-x" data-rule="x" type="number" min="0" max="100" step="0.1"></label><label>세로 위치 (%)<input id="rule-y" data-rule="y" type="number" min="0" max="100" step="0.1"></label><label>너비 (%)<input id="rule-width" data-rule="width" type="number" min="0.1" max="100" step="0.1"></label><label>최대 높이 (%)<input id="rule-maxHeight" data-rule="maxHeight" type="number" min="0.1" max="100" step="0.1"></label></div><p class="help">위치와 크기는 캔버스 기준입니다. 요소 비율을 유지하고 화면 밖으로 나가지 않게 조절합니다.</p></fieldset>
+        <div class="status" id="status">요소가 분리된 디자인 파일을 불러와 주세요.</div>
+      </aside>
+      <div class="stage">
+        <div class="stage-head"><strong>미리보기 <span id="preview-dimensions">1080 × 1080 · 정사각형</span></strong><span id="selection-label">편집할 요소를 선택하세요</span></div>
+        <div class="canvas-wrap" id="canvas-wrap"><div class="empty" id="empty"><b>작업 캔버스</b>PSD·SVG 또는 로컬 AI 파일을 열면 변환된 디자인을 여기에서 미리 보고 수정할 수 있습니다.</div><svg id="artboard" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="디자인 미리보기"></svg></div>
+        <div class="footer-row"><span>PNG 파일 · 선택한 규격의 실제 픽셀 크기로 저장</span><button class="export" id="export" disabled>PNG 다운로드</button></div>
+      </div>
+      <section class="layer-panel" id="layer-panel" aria-label="레이어" hidden><p class="layer-heading">레이어</p><div class="layer-list" id="layer-list"></div></section>
+    </section>
+  </main>
+  <div class="layer-menu" id="layer-menu" role="menu" aria-label="요소 순서 조정" hidden>
+    <button type="button" role="menuitem" data-layer-action="front">맨 앞으로</button>
+    <button type="button" role="menuitem" data-layer-action="forward">앞으로</button>
+    <button type="button" role="menuitem" data-layer-action="backward">뒤로</button>
+    <button type="button" role="menuitem" data-layer-action="back">맨 뒤로</button>
+  </div>
+  <script src="./vendor/moveable.min.js"></script>
+  <script src="./vendor/ag-psd.bundle.js"></script>
+  <script type="module">
+    import { planLayerLayout, defaultLayerRule } from './layout.mjs';
+    import { applyRasterMask, solidStroke } from './psd-pixels.mjs';
+    import { aiConvertEndpoint } from './runtime-config.mjs';
+    if (!aiConvertEndpoint) {
+      document.querySelector('.file-button').textContent = 'PSD·SVG 파일 선택';
+      document.querySelector('#file-label').innerHTML = '요소가 분리된 PSD·SVG 파일을 올려주세요.<br>AI 파일은 Illustrator에서 SVG로 저장해 주세요.';
+      document.querySelector('#file-input').accept = '.psd,.svg,image/svg+xml,image/vnd.adobe.photoshop';
+    }
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const artboard = document.querySelector('#artboard');
+    const fileInput = document.querySelector('#file-input');
+    const preset = document.querySelector('#preset');
+    const statusBox = document.querySelector('#status');
+    const layerMenu = document.querySelector('#layer-menu');
+    const layerPanel = document.querySelector('#layer-panel');
+    const layerList = document.querySelector('#layer-list');
+    const editableTags = new Set(['path','use','rect','circle','ellipse','polygon','polyline','line','text','image']);
+    let sourceSvg = null, selected = null, selectedCount = 0, targetW = 1080, targetH = 1080, fitGroup = null;
+    const hiddenLayers = new Set();
+    const layerRules = new Map();
+    const layerRecords = new Map();
+    const automaticRules = new Map();
+    const layerOrder = new Map();
+    const moveable = new Moveable(document.body, {
+      target: null, container: document.body, rootContainer: document.body, useAccuratePosition: true,
+      draggable: true, scalable: true,
+      rotatable: true, keepRatio: true, renderDirections: ['nw', 'ne', 'sw', 'se'],
+      rotationPosition: 'top', origin: false, throttleDrag: 0, throttleScale: 0, throttleRotate: 0,
+    });
+    moveable.on('drag', ({ target, transform }) => { target.style.transform = transform; });
+    moveable.on('scale', ({ target, afterTransform }) => { target.style.transform = afterTransform; });
+    moveable.on('rotate', ({ target, afterTransform }) => { target.style.transform = afterTransform; });
+    moveable.on('dragEnd', ({ target }) => rememberLayerRule(target));
+    moveable.on('scaleEnd', ({ target }) => rememberLayerRule(target));
+    moveable.on('rotateEnd', ({ target }) => rememberLayerRule(target));
+
+    function setStatus(message, error = false) { statusBox.textContent = message; statusBox.classList.toggle('error', error); }
+    function parseLength(value, fallback) { const n = Number.parseFloat(value); return Number.isFinite(n) && n > 0 ? n : fallback; }
+
+    async function loadAi(file) {
+      if (!file) return;
+      if (/\.psd$/i.test(file.name)) return loadPsd(file);
+      document.querySelector('#file-label').textContent = file.name;
+      if (/\.svg$/i.test(file.name)) {
+        try { await setSource(await file.text(), file.name); }
+        catch (error) { setStatus(error.message, true); }
+        return;
+      }
+      if (!aiConvertEndpoint) {
+        setStatus('이 웹사이트에서는 PSD·SVG를 직접 불러올 수 있습니다. AI 파일은 Illustrator에서 SVG로 저장한 뒤 올려주세요. AI 직접 변환은 로컬 서버에서 지원합니다.', true);
+        return;
+      }
+      setStatus('AI 파일을 읽고 벡터 요소를 꺼내는 중…');
+      try {
+        const response = await fetch(aiConvertEndpoint, { method: 'POST', headers: { 'x-file-name': encodeURIComponent(file.name), 'content-type': 'application/octet-stream' }, body: file });
+        if (!response.ok) { const result = await response.json(); throw new Error(result.error || '파일 변환에 실패했습니다.'); }
+        await setSource(await response.text(), file.name);
+      } catch (error) { setStatus(error.message, true); }
+    }
+
+    async function loadPsd(file) {
+      document.querySelector('#file-label').textContent = file.name;
+      setStatus('PSD 파일의 레이어를 읽는 중…');
+      try {
+        if (file.size > 100 * 1024 * 1024) throw new Error('MVP에서는 100MB 이하 PSD 파일을 지원합니다.');
+        const psd = agPsd.readPsd(await file.arrayBuffer(), { logMissingFeatures: true });
+        if (!psd.width || !psd.height || psd.width * psd.height > 40000000) throw new Error('이미지 크기가 너무 크거나 읽을 수 없는 PSD 파일입니다.');
+        const root = document.createElementNS(SVG_NS, 'svg');
+        root.setAttribute('xmlns', SVG_NS); root.setAttribute('width', psd.width); root.setAttribute('height', psd.height);
+        root.setAttribute('viewBox', `0 0 ${psd.width} ${psd.height}`); root.setAttribute('data-psd-layers', 'true');
+        let layerCount = 0, decodedPixels = 0;
+        const appendLayers = (layers, parent) => {
+          for (const layer of layers || []) {
+            if (layer.hidden) continue;
+            if (layer.children?.length) {
+              const group = document.createElementNS(SVG_NS, 'g');
+              let opacity = Number(layer.opacity ?? 1); if (opacity > 1) opacity /= 255;
+              if (opacity < 1) group.setAttribute('opacity', String(opacity));
+              if (layer.blendMode && layer.blendMode !== 'normal') group.style.mixBlendMode = layer.blendMode;
+              parent.append(group); appendLayers(layer.children, group); continue;
+            }
+            let canvas = layer.canvas;
+            if (!canvas || !canvas.width || !canvas.height) continue;
+            decodedPixels += canvas.width * canvas.height;
+            if (decodedPixels > 120000000) throw new Error('레이어 이미지 총 크기가 너무 큽니다. 크기를 줄인 PSD를 사용해 주세요.');
+            let layerLeft = layer.left || 0, layerTop = layer.top || 0;
+            const mask = layer.mask;
+            const strokes = (layer.effects?.stroke || []).filter(s => s.enabled && s.fillType === 'color' && s.blendMode === 'normal' && s.size?.units === 'Pixels' && s.size.value > 0 && s.size.value <= 64 && ['inside','outside'].includes(s.position));
+            if ((mask?.canvas && !mask.disabled) || strokes.length) {
+              const padding = Math.ceil(Math.max(0,...strokes.filter(s=>s.position==='outside').map(s=>s.size.value)));
+              const working = document.createElement('canvas'); working.width = canvas.width + padding * 2; working.height = canvas.height + padding * 2;
+              const context = working.getContext('2d'); context.drawImage(canvas,padding,padding);
+              layerLeft -= padding; layerTop -= padding;
+              const data = context.getImageData(0,0,working.width,working.height);
+              if (mask?.canvas) applyRasterMask(data.data,working.width,working.height,layerLeft,layerTop,{
+                ...mask, width:mask.canvas.width, height:mask.canvas.height,
+                pixels:mask.canvas.getContext('2d').getImageData(0,0,mask.canvas.width,mask.canvas.height).data
+              });
+              for (const stroke of strokes) solidStroke(data.data,working.width,working.height,stroke.size.value,stroke.color,stroke.opacity ?? 1,stroke.position === 'outside');
+              context.putImageData(data,0,0); canvas = working;
+            }
+            const sourceContext = canvas.getContext('2d');
+            const pixels = sourceContext.getImageData(0, 0, canvas.width, canvas.height).data;
+            let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+            for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
+              if (pixels[(y * canvas.width + x) * 4 + 3] === 0) continue;
+              if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
+            }
+            if (maxX < minX || maxY < minY) continue;
+            const trimmed = document.createElement('canvas'); trimmed.width = maxX - minX + 1; trimmed.height = maxY - minY + 1;
+            trimmed.getContext('2d').putImageData(sourceContext.getImageData(minX, minY, trimmed.width, trimmed.height), 0, 0);
+            const image = document.createElementNS(SVG_NS, 'image');
+            image.setAttribute('href', trimmed.toDataURL('image/png')); image.setAttribute('x', String(layerLeft + minX)); image.setAttribute('y', String(layerTop + minY));
+            image.setAttribute('width', String(trimmed.width)); image.setAttribute('height', String(trimmed.height));
+            image.setAttribute('data-layer-name', layer.name || `레이어 ${layerCount + 1}`);
+            let opacity = Number(layer.opacity ?? 1); if (opacity > 1) opacity /= 255;
+            if (opacity < 1) image.setAttribute('opacity', String(opacity));
+            if (layer.blendMode && layer.blendMode !== 'normal') image.style.mixBlendMode = layer.blendMode;
+            parent.append(image); layerCount++;
+          }
+        };
+        appendLayers(psd.children, root);
+        if (!layerCount) throw new Error('화면에 표시할 수 있는 레이어 이미지가 없습니다. 병합된 PSD이거나 지원되지 않는 레이어 형식일 수 있습니다.');
+        await setSource(new XMLSerializer().serializeToString(root), file.name);
+      } catch (error) { setStatus(`PSD를 불러오지 못했습니다. RGB·8비트 PSD인지 확인해 주세요.\n${error.message}`, true); }
+    }
+
+    async function loadSample() {
+      document.querySelector('#file-label').textContent = 'Illustrator 배너 샘플 · 벡터 도형 8개';
+      setStatus('Illustrator 파일에서 변환한 벡터 샘플을 읽는 중…');
+      try { const response = await fetch('./assets/sample-real-banner.svg'); if (!response.ok) throw new Error('샘플을 불러오지 못했습니다.'); await setSource(await response.text(), 'gh-markdown-banner'); }
+      catch (error) { setStatus(error.message, true); }
+    }
+
+    async function loadPsdSample() {
+      try {
+        const response = await fetch('./assets/reflow-demo.psd');
+        if (!response.ok) throw new Error('PSD 샘플을 불러오지 못했습니다.');
+        await loadPsd(new File([await response.blob()], 'reflow-demo.psd', { type: 'image/vnd.adobe.photoshop' }));
+      } catch (error) { setStatus(error.message, true); }
+    }
+
+    function makeEditableTree(node, box) {
+      const name = node.localName;
+      if (['defs','style','title','desc','metadata','clipPath','mask','pattern','linearGradient','radialGradient','filter','symbol'].includes(name)) return node.cloneNode(true);
+      if (name === 'g') {
+        const copy = node.cloneNode(false);
+        const children = [...node.children];
+        const isTextRun = children.length > 1 && children.every(child => child.localName === 'use');
+        if (isTextRun) return makeWrapper(node.cloneNode(true));
+        for (const child of children) copy.append(makeEditableTree(child, box));
+        return copy;
+      }
+      if (editableTags.has(name)) {
+        const cloned = node.cloneNode(true);
+        return makeWrapper(cloned);
+      }
+      return node.cloneNode(true);
+    }
+
+    function makeWrapper(content) {
+      const wrapper = document.createElementNS(SVG_NS, 'g');
+      wrapper.classList.add('editable'); wrapper.dataset.id = String(++selectedCount); wrapper.dataset.tx = '0'; wrapper.dataset.ty = '0'; wrapper.dataset.scale = '1';
+      const layerName = content.getAttribute('data-layer-name'); if (layerName) wrapper.dataset.name = layerName;
+      const layerArea = Number(content.getAttribute('width')) * Number(content.getAttribute('height'));
+      if (sourceSvg?.box && layerArea >= sourceSvg.box.width * sourceSvg.box.height * .6) wrapper.dataset.canvasLayer = 'true';
+      wrapper.setAttribute('transform', 'translate(0 0)');
+      wrapper.append(content);
+      return wrapper;
+    }
+
+    async function setSource(svgText, name) {
+      const parsed = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+      const inputRoot = parsed.documentElement;
+      if (parsed.querySelector('parsererror') || inputRoot.localName !== 'svg') throw new Error('SVG 벡터로 읽지 못했습니다. PDF 호환 AI 파일인지 확인해 주세요.');
+      for (const bad of inputRoot.querySelectorAll('script, foreignObject')) bad.remove();
+      for (const node of inputRoot.querySelectorAll('*')) for (const attr of [...node.attributes]) {
+        if (/^on/i.test(attr.name)) node.removeAttribute(attr.name);
+        if ((attr.name === 'href' || attr.name.endsWith(':href')) && attr.value && !attr.value.startsWith('#') && !attr.value.startsWith('data:image/')) node.removeAttribute(attr.name);
+      }
+      const vb = (inputRoot.getAttribute('viewBox') || `0 0 ${parseLength(inputRoot.getAttribute('width'), 612)} ${parseLength(inputRoot.getAttribute('height'), 408)}`).trim().split(/[ ,]+/).map(Number);
+      const box = { x: vb[0] || 0, y: vb[1] || 0, width: vb[2] || 612, height: vb[3] || 408 };
+      const preserveLayerLayout = inputRoot.getAttribute('data-psd-layers') === 'true';
+      sourceSvg = { root: inputRoot, box, name, preserveLayerLayout, layerCount: inputRoot.querySelectorAll('image[data-layer-name]').length };
+      inputRoot.removeAttribute('data-psd-layers');
+      selectedCount = 0; hiddenLayers.clear(); layerRules.clear(); layerRecords.clear(); layerOrder.clear(); automaticRules.clear(); selectElement(null);
+      artboard.classList.add('has-art'); document.querySelector('#empty').hidden = true;
+      applyPreset(false); const layout = applyResponsiveLayout();
+      document.querySelector('#auto-fit').disabled = false; document.querySelector('#export').disabled = false;
+      if (selectedCount === 0) setStatus(`${name}은 화면으로 변환됐지만 편집 가능한 요소를 찾지 못했습니다. 파일이 이미지로 합쳐졌거나 복합 효과가 포함됐는지 확인해 주세요.`, true);
+      else if (preserveLayerLayout) setStatus(`${name} 불러오기 완료 · PSD 레이어 ${sourceSvg.layerCount}개를 새 규격에 맞춰 자동 배치했습니다. 세부 위치와 크기는 직접 조정할 수 있습니다.`);
+      else setStatus(`${name} 불러오기 완료 · 요소 ${selectedCount}개에 개별 반응형 기준을 적용했습니다.`);
+    }
+
+    function applyPreset(render = true) {
+      const values = preset.value === 'custom' ? [Math.round(sourceSvg?.box.width || 612), Math.round(sourceSvg?.box.height || 408)] : preset.value === 'manual' ? [Number(document.querySelector('#canvas-width').value), Number(document.querySelector('#canvas-height').value)] : preset.value.split(',').map(Number);
+      if (!values.every(value => Number.isFinite(value) && value >= 64 && value <= 4096)) return;
+      [targetW, targetH] = values;
+      document.querySelector('#canvas-width').value = targetW;
+      document.querySelector('#canvas-height').value = targetH;
+      artboard.setAttribute('viewBox', `0 0 ${targetW} ${targetH}`); artboard.setAttribute('width', targetW); artboard.setAttribute('height', targetH);
+      document.querySelector('#dimensions').textContent = `${targetW} × ${targetH} px`;
+      const ratioName = targetW === targetH ? '정사각형' : targetH > targetW ? '세로형' : '가로형';
+      document.querySelector('#preview-dimensions').textContent = `${targetW} × ${targetH} · ${ratioName}`;
+      updateArtboardDisplaySize();
+      if (sourceSvg && render) {
+        const applied = applyResponsiveLayout();
+        setStatus(applied ? `${targetW} × ${targetH} · 각 요소의 위치와 크기를 개별 반응형 기준으로 계산했습니다.` : '파일에서 편집 가능한 요소를 찾지 못했습니다.');
+      }
+    }
+
+    function updateArtboardDisplaySize() {
+      const wrap = document.querySelector('#canvas-wrap');
+      if (!wrap || !targetW || !targetH) return;
+      const maxWidth = Math.max(120, wrap.clientWidth - 28);
+      const maxHeight = Math.max(180, Math.min(window.innerHeight * .66, wrap.clientHeight - 28 || window.innerHeight * .66));
+      const displayWidth = Math.min(maxWidth, maxHeight * targetW / targetH);
+      artboard.style.width = `${displayWidth}px`;
+      artboard.style.height = `${displayWidth * targetH / targetW}px`;
+    }
+
+    function renderSource() {
+      selectedCount = 0; selectElement(null);
+      artboard.replaceChildren();
+      const background = document.createElementNS(SVG_NS, 'rect'); background.setAttribute('width', targetW); background.setAttribute('height', targetH); background.setAttribute('fill', '#fff'); artboard.append(background);
+      const { root, box } = sourceSvg;
+      const defs = root.querySelector(':scope > defs'); if (defs) artboard.append(defs.cloneNode(true));
+      const k = Math.min(targetW / box.width, targetH / box.height);
+      const x = (targetW - box.width * k) / 2 - box.x * k, y = (targetH - box.height * k) / 2 - box.y * k;
+      sourceSvg.fit = { k, x, y };
+      fitGroup = document.createElementNS(SVG_NS, 'g'); fitGroup.setAttribute('transform', `translate(${x} ${y}) scale(${k})`);
+      for (const child of [...root.children]) if (child.localName !== 'defs') fitGroup.append(makeEditableTree(child, box));
+      // Keep inherited transforms, clipping and opacity inside each editable layer.
+      // Layers can then share a single stack, including across PSD folders.
+      const editable = [...fitGroup.querySelectorAll('.editable')];
+      const branches = [...fitGroup.children].filter(node => node.querySelector('.editable'));
+      for (const el of editable) {
+        let contents = document.createDocumentFragment();
+        while (el.firstChild) contents.append(el.firstChild);
+        for (let parent = el.parentElement; parent && parent !== fitGroup; parent = parent.parentElement) {
+          const inherited = parent.cloneNode(false);
+          inherited.removeAttribute('id');
+          inherited.append(contents); contents = inherited;
+        }
+        el.append(contents);
+      }
+      for (const el of editable) fitGroup.append(el);
+      for (const branch of branches) branch.remove();
+      artboard.append(fitGroup);
+      document.querySelector('#selection-label').textContent = '편집할 요소를 선택하세요';
+    }
+
+    function screenMatrix(node) {
+      const m = node.getScreenCTM();
+      return new DOMMatrix([m.a,m.b,m.c,m.d,m.e,m.f]);
+    }
+
+    function applyResponsiveLayout() {
+      const selectedId = selected?.dataset.id;
+      renderSource();
+      fitGroup.removeAttribute('transform');
+      const layers = [...fitGroup.querySelectorAll('.editable')];
+      const rootInverse = screenMatrix(fitGroup).inverse();
+      layerRecords.clear();
+      const records = layers.map((el, index) => {
+        const id = el.dataset.id, b = el.getBBox();
+        const parentMatrix = rootInverse.multiply(screenMatrix(el.parentElement));
+        const corners = [[b.x,b.y],[b.x+b.width,b.y],[b.x,b.y+b.height],[b.x+b.width,b.y+b.height]].map(([x,y]) => new DOMPoint(x,y).matrixTransform(parentMatrix));
+        const x = Math.min(...corners.map(p => p.x)), y = Math.min(...corners.map(p => p.y));
+        const bounds = { x, y, width: Math.max(...corners.map(p=>p.x))-x, height: Math.max(...corners.map(p=>p.y))-y };
+        const sourceBox = sourceSvg.box;
+        const background = bounds.x <= sourceBox.x + sourceBox.width * .025 && bounds.y <= sourceBox.y + sourceBox.height * .025
+          && bounds.x + bounds.width >= sourceBox.x + sourceBox.width * .975
+          && bounds.y + bounds.height >= sourceBox.y + sourceBox.height * .975;
+        const record = { id, bounds, background, parentMatrix };
+        el.dataset.id = id;
+        if (background) el.dataset.canvasLayer = 'true'; else delete el.dataset.canvasLayer;
+        layerRecords.set(id, record);
+        return record;
+      });
+      const plan = planLayerLayout({ layers: records, source: sourceSvg.box, target: { width: targetW, height: targetH }, rules: layerRules });
+      automaticRules.clear();
+      for (const placement of plan.backgrounds) {
+        const el = layers[Number(placement.id)-1], record = layerRecords.get(placement.id);
+        const image = el.querySelector('image');
+        const b = record.bounds;
+        const cover = Math.max(targetW/b.width,targetH/b.height);
+        const fill = image
+          ? new DOMMatrix().translate(targetW/2,targetH/2).scale(cover).translate(-b.x-b.width/2,-b.y-b.height/2)
+          : new DOMMatrix().scale(targetW/b.width,targetH/b.height).translate(-b.x,-b.y);
+        el.setAttribute('transform', record.parentMatrix.inverse().multiply(fill).multiply(record.parentMatrix).toString());
+      }
+      for (const placement of plan.placements) {
+        const el = layers[Number(placement.id)-1], record = layerRecords.get(placement.id), b = record.bounds;
+        const response = new DOMMatrix().translate(placement.cx,placement.cy).rotate(placement.rotation).scale(placement.scale).translate(-b.x-b.width/2,-b.y-b.height/2);
+        el.setAttribute('transform', record.parentMatrix.inverse().multiply(response).multiply(record.parentMatrix).toString());
+        el.dataset.responseScale = placement.scale;
+        automaticRules.set(placement.id, placement.rule);
+      }
+      // Restore sibling order without changing stable layer identities.
+      for (const parent of new Set(layers.map(el => el.parentElement))) {
+        const children = [...parent.children].filter(el => el.classList.contains('editable'));
+        children.sort((a,b) => (layerOrder.get(a.dataset.id) ?? Number(a.dataset.id)) - (layerOrder.get(b.dataset.id) ?? Number(b.dataset.id)));
+        for (const child of children) parent.append(child);
+      }
+      document.querySelector('#layout-note').textContent = plan.mode === 'columns' ? '가로 규격: 본문과 제목을 좌우로 배치 · 각 요소는 개별 편집 가능' : plan.mode === 'source' ? '원본 비율 유지 · 각 요소는 개별 편집 가능' : '세로·정사각형: 여백을 나누고 요소 관계를 유지해 배치';
+      wireElements();
+      if (selectedId) selectElement(artboard.querySelector(`.editable[data-id="${selectedId}"]`));
+      return layers.length > 0;
+    }
+
+    function currentLayerRule(id) {
+      const record = layerRecords.get(String(id));
+      return record ? { ...(automaticRules.get(String(id)) || defaultLayerRule(record,sourceSvg.box)), ...layerRules.get(String(id)) } : null;
+    }
+
+    function syncResponsivePanel() {
+      const panel = document.querySelector('#responsive-panel');
+      panel.hidden = !selected || selected.dataset.canvasLayer === 'true';
+      if (panel.hidden) return;
+      const rule = currentLayerRule(selected.dataset.id);
+      if (!rule) return;
+      panel.querySelectorAll('[data-rule]').forEach(input => {
+        if (document.activeElement !== input) input.value = (rule[input.dataset.rule] * 100).toFixed(1);
+      });
+    }
+
+    function rememberLayerRule(target) {
+      moveable.updateRect();
+      if (!target || target.dataset.canvasLayer === 'true') return;
+      const record = layerRecords.get(target.dataset.id);
+      const visual = target.querySelector(':scope > g[data-layout-visual]');
+      if (!record || !visual) return;
+      const matrix = screenMatrix(fitGroup).inverse().multiply(screenMatrix(visual)).multiply(record.parentMatrix.inverse());
+      const b = record.bounds;
+      const center = new DOMPoint(b.x+b.width/2,b.y+b.height/2).matrixTransform(matrix);
+      const scale = Math.hypot(matrix.a,matrix.b);
+      const existing = currentLayerRule(record.id);
+      layerRules.set(record.id, { ...existing, x:center.x/targetW, y:center.y/targetH, width:b.width*scale/targetW, maxHeight:Math.max(existing.maxHeight,b.height*scale/targetH), rotation:Math.atan2(matrix.b,matrix.a)*180/Math.PI });
+      syncResponsivePanel();
+    }
+
+    function wireElements() {
+      const elements = [...artboard.querySelectorAll('.editable')];
+      elements.forEach((el, index) => {
+        const bounds = el.getBBox();
+        el.dataset.cx ??= bounds.x + bounds.width / 2; el.dataset.cy ??= bounds.y + bounds.height / 2;
+        el.dataset.tx ??= '0'; el.dataset.ty ??= '0'; el.dataset.scale ??= '1';
+        const hidden = hiddenLayers.has(el.dataset.id);
+        el.dataset.hidden = String(hidden); el.style.display = hidden ? 'none' : '';
+        el.addEventListener('click', event => { event.stopPropagation(); selectElement(el); });
+      });
+      layerPanel.hidden = !elements.length;
+      if (elements.length) {
+        layerList.replaceChildren();
+        [...elements].reverse().forEach((el, index) => {
+          const row = document.createElement('div');
+          row.className = 'layer-row'; row.dataset.layerRow = el.dataset.id;
+          const selectButton = document.createElement('button');
+          selectButton.type = 'button'; selectButton.className = 'layer-item'; selectButton.dataset.selectLayer = el.dataset.id;
+          selectButton.setAttribute('aria-label', `레이어 선택: ${el.dataset.name || `레이어 ${elements.length - index}`}`);
+          const image = el.querySelector('image');
+          const preview = document.createElement(image?.getAttribute('href') ? 'img' : 'span');
+          preview.className = 'layer-thumb';
+          if (image?.getAttribute('href')) { preview.src = image.getAttribute('href'); preview.alt = ''; }
+          else preview.textContent = '◇';
+          const name = document.createElement('span'); name.className = 'layer-name';
+          name.textContent = el.dataset.name || `레이어 ${elements.length - index}`;
+          selectButton.append(preview, name);
+
+          const visibilityButton = document.createElement('button');
+          visibilityButton.type = 'button'; visibilityButton.className = 'layer-visibility';
+          visibilityButton.dataset.toggleLayer = el.dataset.id;
+          const hidden = hiddenLayers.has(el.dataset.id);
+          row.classList.toggle('is-hidden', hidden);
+          visibilityButton.textContent = hidden ? '◌' : '◉';
+          visibilityButton.setAttribute('aria-label', hidden ? '레이어 보이기' : '레이어 숨기기');
+          visibilityButton.title = hidden ? '레이어 보이기' : '레이어 숨기기';
+          row.append(selectButton, visibilityButton); layerList.append(row);
+        });
+      }
+      selectedCount = elements.length;
+    }
+
+    function selectElement(el) {
+      selected?.classList.remove('selected'); selected = el;
+      if (el && !el.dataset.moveableReady) {
+        const baseTransform = el.getAttribute('transform');
+        if (baseTransform) {
+          const visual = document.createElementNS(SVG_NS, 'g');
+          visual.dataset.layoutVisual = 'true';
+          visual.setAttribute('transform', baseTransform);
+          while (el.firstChild) visual.append(el.firstChild);
+          el.append(visual); el.removeAttribute('transform');
+        }
+        el.dataset.moveableReady = 'true';
+      }
+      moveable.target = el?.dataset.hidden === 'true' ? null : el;
+      layerList.querySelectorAll('.layer-item').forEach(button => button.classList.toggle('active', button.dataset.selectLayer === el?.dataset.id));
+      document.querySelector('#selection-label').textContent = el ? `요소 ${el.dataset.id}${el.dataset.name ? ` · ${el.dataset.name}` : ''} 선택됨` : '편집할 요소를 선택하세요';
+      syncResponsivePanel();
+      if (el) requestAnimationFrame(() => moveable.updateRect());
+    }
+
+    artboard.addEventListener('click', event => { if (!event.target.closest?.('.editable')) selectElement(null); });
+    layerList.addEventListener('click', event => {
+      const visibilityButton = event.target.closest('[data-toggle-layer]');
+      if (visibilityButton) {
+        const target = artboard.querySelector(`.editable[data-id="${visibilityButton.dataset.toggleLayer}"]`);
+        if (!target) return;
+        const hidden = target.dataset.hidden !== 'true';
+        if (hidden) hiddenLayers.add(target.dataset.id); else hiddenLayers.delete(target.dataset.id);
+        target.dataset.hidden = String(hidden); target.style.display = hidden ? 'none' : '';
+        const row = visibilityButton.closest('.layer-row');
+        row.classList.toggle('is-hidden', hidden);
+        visibilityButton.textContent = hidden ? '◌' : '◉';
+        visibilityButton.setAttribute('aria-label', hidden ? '레이어 보이기' : '레이어 숨기기');
+        visibilityButton.title = hidden ? '레이어 보이기' : '레이어 숨기기';
+        if (hidden && selected === target) selectElement(null);
+        return;
+      }
+      const button = event.target.closest('[data-select-layer]');
+      if (!button) return;
+      const el = artboard.querySelector(`.editable[data-id="${button.dataset.selectLayer}"]`);
+      if (el) selectElement(el);
+    });
+    artboard.addEventListener('contextmenu', event => {
+      const el = event.target.closest?.('.editable');
+      if (!el || !artboard.contains(el)) { layerMenu.hidden = true; return; }
+      event.preventDefault(); event.stopPropagation(); selectElement(el); layerMenu.hidden = false;
+      const menuRect = layerMenu.getBoundingClientRect();
+      layerMenu.style.left = `${Math.max(8, Math.min(event.clientX, innerWidth - menuRect.width - 8))}px`;
+      layerMenu.style.top = `${Math.max(8, Math.min(event.clientY, innerHeight - menuRect.height - 8))}px`;
+    });
+    layerMenu.addEventListener('pointerdown', event => event.stopPropagation());
+    layerMenu.addEventListener('click', event => {
+      const action = event.target.closest('[data-layer-action]')?.dataset.layerAction;
+      if (action && selected) reorderElement(selected, action);
+      layerMenu.hidden = true;
+    });
+    document.addEventListener('pointerdown', event => { if (!layerMenu.contains(event.target)) layerMenu.hidden = true; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') layerMenu.hidden = true; });
+
+    function reorderElement(el, action) {
+      const siblings = [...el.parentElement.children].filter(node => node.classList?.contains('editable'));
+      const index = siblings.indexOf(el); if (index < 0) return;
+      if (action === 'front') el.parentElement.append(el);
+      if (action === 'back') el.parentElement.insertBefore(el, siblings[0]);
+      if (action === 'forward' && index < siblings.length - 1) el.parentElement.insertBefore(siblings[index + 1], el);
+      if (action === 'backward' && index > 0) el.parentElement.insertBefore(el, siblings[index - 1]);
+      [...fitGroup.querySelectorAll('.editable')].forEach((node, index) => layerOrder.set(node.dataset.id, index + 1));
+      wireLayerOrder();
+      moveable.updateRect();
+    }
+    function wireLayerOrder() {
+      for (const el of [...fitGroup.querySelectorAll('.editable')].reverse()) {
+        const row = layerList.querySelector(`[data-layer-row="${el.dataset.id}"]`);
+        if (row) layerList.append(row);
+      }
+    }
+    function autoFit() {
+      if (!sourceSvg) return;
+      layerRules.clear();
+      const applied = applyResponsiveLayout();
+      setStatus(applied ? `요소 ${selectedCount}개의 개별 반응형 기준을 초기화했습니다.` : '편집 가능한 요소를 찾지 못했습니다.', !applied);
+    }
+    async function exportPng() {
+      if (!sourceSvg) return;
+      setStatus('PNG 이미지를 만드는 중…');
+      try {
+        const clone = artboard.cloneNode(true); clone.classList.remove('has-art'); clone.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+        // Export has no page stylesheet, including SVG transform origins.
+        for (const el of clone.querySelectorAll('.editable[data-moveable-ready]')) {
+          el.style.transformBox = 'fill-box'; el.style.transformOrigin = 'center';
+        }
+        clone.setAttribute('xmlns', SVG_NS); clone.setAttribute('width', targetW); clone.setAttribute('height', targetH);
+        clone.style.width = `${targetW}px`; clone.style.height = `${targetH}px`;
+        clone.style.maxHeight = 'none';
+        const blob = new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml;charset=utf-8' });
+        const objectUrl = URL.createObjectURL(blob); const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement('canvas'); canvas.width = targetW; canvas.height = targetH;
+          const context = canvas.getContext('2d'); context.fillStyle = '#fff'; context.fillRect(0, 0, targetW, targetH); context.drawImage(image, 0, 0, targetW, targetH);
+          canvas.toBlob(png => {
+            URL.revokeObjectURL(objectUrl);
+            if (!png) { setStatus('PNG 저장에 실패했습니다. 브라우저에서 SVG 미리보기를 확인해 주세요.', true); return; }
+            const link = document.createElement('a'); const pngUrl = URL.createObjectURL(png); link.href = pngUrl; link.download = `${sourceSvg.name.replace(/\.(ai|psd|svg)$/i, '')}-${targetW}x${targetH}.png`; link.click(); setTimeout(() => URL.revokeObjectURL(pngUrl), 1500); setStatus('PNG 저장이 완료되었습니다.');
+          }, 'image/png');
+        };
+        image.onerror = () => { URL.revokeObjectURL(objectUrl); setStatus('PNG 변환에 실패했습니다. 파일 안에 브라우저에서 처리할 수 없는 요소가 있을 수 있습니다.', true); };
+        image.src = objectUrl;
+      } catch (error) { setStatus(error.message, true); }
+    }
+
+    fileInput.addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      event.target.value = ''; // Selecting the same source again starts a fresh import.
+      loadAi(file);
+    });
+    document.querySelector('#sample-link').addEventListener('click', loadSample);
+    document.querySelector('#psd-sample-link').addEventListener('click', loadPsdSample);
+    preset.addEventListener('change', () => applyPreset(true));
+    let canvasUpdate;
+    for (const input of document.querySelectorAll('#canvas-width,#canvas-height')) input.addEventListener('input', () => {
+      clearTimeout(canvasUpdate);
+      canvasUpdate = setTimeout(() => {
+        const inputs = [...document.querySelectorAll('#canvas-width,#canvas-height')];
+        if (!inputs.every(el=>el.value && el.validity.valid)) return;
+        preset.value = 'manual'; applyPreset(true);
+      }, 120);
+    });
+    document.querySelector('#responsive-panel').addEventListener('input', event => {
+      const input = event.target.closest('[data-rule]');
+      if (!input || !selected || !input.value || !input.validity.valid) return;
+      const id = selected.dataset.id;
+      layerRules.set(id,{...currentLayerRule(id),[input.dataset.rule]:Number(input.value)/100});
+      applyResponsiveLayout();
+    });
+    document.querySelector('#auto-fit').addEventListener('click', autoFit);
+    document.querySelector('#export').addEventListener('click', exportPng);
+    window.addEventListener('resize', () => { updateArtboardDisplaySize(); if (selected) moveable.updateRect(); });
+  </script>
+</body>
+</html>

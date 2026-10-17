@@ -1,0 +1,277 @@
+[
+  {
+    "id": "1",
+    "name": "Background",
+    "background": true,
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 2480,
+      "height": 3508
+    }
+  },
+  {
+    "id": "2",
+    "name": "Folder Vector",
+    "background": false,
+    "bounds": {
+      "x": 206,
+      "y": 1460,
+      "width": 995,
+      "height": 762
+    }
+  },
+  {
+    "id": "3",
+    "name": "Folder Vector",
+    "background": false,
+    "bounds": {
+      "x": 206,
+      "y": 1607,
+      "width": 995,
+      "height": 658
+    }
+  },
+  {
+    "id": "4",
+    "name": "Folder Vector",
+    "background": false,
+    "bounds": {
+      "x": 1669,
+      "y": 928,
+      "width": 353,
+      "height": 292
+    }
+  },
+  {
+    "id": "5",
+    "name": "Folder Vector ",
+    "background": false,
+    "bounds": {
+      "x": 1980,
+      "y": 767,
+      "width": 353,
+      "height": 292
+    }
+  },
+  {
+    "id": "6",
+    "name": "Arrow Vector",
+    "background": false,
+    "bounds": {
+      "x": 1177,
+      "y": 1805,
+      "width": 85,
+      "height": 95
+    }
+  },
+  {
+    "id": "7",
+    "name": "Ellipse Folder",
+    "background": false,
+    "bounds": {
+      "x": 491,
+      "y": 2315,
+      "width": 67,
+      "height": 67
+    }
+  },
+  {
+    "id": "8",
+    "name": "Ellipse Folder",
+    "background": false,
+    "bounds": {
+      "x": 1712,
+      "y": 1249,
+      "width": 31,
+      "height": 32
+    }
+  },
+  {
+    "id": "9",
+    "name": "Ellipse Folder",
+    "background": false,
+    "bounds": {
+      "x": 2041,
+      "y": 1088,
+      "width": 31,
+      "height": 32
+    }
+  },
+  {
+    "id": "10",
+    "name": "Place Your Image Here (Double Click to Edit)",
+    "background": false,
+    "bounds": {
+      "x": 296,
+      "y": 625,
+      "width": 815,
+      "height": 1051
+    }
+  },
+  {
+    "id": "11",
+    "name": "Folder Text",
+    "background": false,
+    "bounds": {
+      "x": 569,
+      "y": 2315,
+      "width": 347,
+      "height": 62
+    }
+  },
+  {
+    "id": "12",
+    "name": "Folder Text ",
+    "background": false,
+    "bounds": {
+      "x": 1759,
+      "y": 1250,
+      "width": 216,
+      "height": 29
+    }
+  },
+  {
+    "id": "13",
+    "name": "Folder Text  ",
+    "background": false,
+    "bounds": {
+      "x": 2090,
+      "y": 1089,
+      "width": 175,
+      "height": 30
+    }
+  },
+  {
+    "id": "14",
+    "name": "Hashtag",
+    "background": false,
+    "bounds": {
+      "x": 138,
+      "y": 148,
+      "width": 353,
+      "height": 63
+    }
+  },
+  {
+    "id": "15",
+    "name": "Year",
+    "background": false,
+    "bounds": {
+      "x": 2131,
+      "y": 259,
+      "width": 202,
+      "height": 52
+    }
+  },
+  {
+    "id": "16",
+    "name": "Text Information",
+    "background": false,
+    "bounds": {
+      "x": 2306,
+      "y": 1498,
+      "width": 44,
+      "height": 768
+    }
+  },
+  {
+    "id": "17",
+    "name": "Social Media",
+    "background": false,
+    "bounds": {
+      "x": 685,
+      "y": 144,
+      "width": 203,
+      "height": 56
+    }
+  },
+  {
+    "id": "18",
+    "name": "Image Text",
+    "background": false,
+    "bounds": {
+      "x": 374,
+      "y": 688,
+      "width": 281,
+      "height": 159
+    }
+  },
+  {
+    "id": "19",
+    "name": "Web",
+    "background": false,
+    "bounds": {
+      "x": 1095,
+      "y": 144,
+      "width": 318,
+      "height": 60
+    }
+  },
+  {
+    "id": "20",
+    "name": "Body Text",
+    "background": false,
+    "bounds": {
+      "x": 137,
+      "y": 274,
+      "width": 1276,
+      "height": 44
+    }
+  },
+  {
+    "id": "21",
+    "name": "Date",
+    "background": false,
+    "bounds": {
+      "x": 2091,
+      "y": 2741,
+      "width": 228,
+      "height": 160
+    }
+  },
+  {
+    "id": "22",
+    "name": "Date",
+    "background": false,
+    "bounds": {
+      "x": 2093,
+      "y": 2648,
+      "width": 238,
+      "height": 63
+    }
+  },
+  {
+    "id": "23",
+    "name": "Title",
+    "background": false,
+    "bounds": {
+      "x": 123,
+      "y": 2617,
+      "width": 2210,
+      "height": 778
+    }
+  },
+  {
+    "id": "24",
+    "name": "Place Your Logo Here (Double Click to Edit)",
+    "background": false,
+    "bounds": {
+      "x": 2159,
+      "y": 125,
+      "width": 174,
+      "height": 98
+    }
+  },
+  {
+    "id": "25",
+    "name": "Effect",
+    "background": true,
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 2502,
+      "height": 3550
+    }
+  }
+]
